@@ -30,12 +30,15 @@ import reportlab
 import reportlab.pdfgen.canvas
 from reportlab.lib.units import inch
 
+import argparse
+parser = argparse.ArgumentParser()  
+parser.add_argument('-grid', action='store_true')
+parser.add_argument('pdf_file')
+args = parser.parse_args()
+
 Rect = collections.namedtuple('Rect', ['x', 'y', 'w', 'h'])
 
-if len(sys.argv) < 2:
-	print("usage: " + sys.argv[0] + " <pdf_file>")
-	exit()
-canvas = reportlab.pdfgen.canvas.Canvas(sys.argv[1], pagesize=(PAGE_DIMENSIONS.w * inch, PAGE_DIMENSIONS.h * inch))
+canvas = reportlab.pdfgen.canvas.Canvas(args.pdf_file, pagesize=(PAGE_DIMENSIONS.w * inch, PAGE_DIMENSIONS.h * inch))
 
 colors = [reportlab.lib.colors.black,
 	reportlab.lib.colors.brown,
@@ -56,10 +59,12 @@ class LabelRenderer:
 		self.decade = 0
 
 	def draw_label(self, rect):
-		canvas.setStrokeColor(reportlab.lib.colors.grey)
 		canvas.setFillColor(reportlab.lib.colors.black)
-		canvas.setLineWidth(1)
-		canvas.rect(rect.x * inch, rect.y * inch, rect.w * inch, rect.h * inch)
+
+		if args.grid:
+			canvas.setStrokeColor(reportlab.lib.colors.grey)
+			canvas.setLineWidth(1)
+			canvas.rect(rect.x * inch, rect.y * inch, rect.w * inch, rect.h * inch)
 
 		v = series[self.pos] *  10 ** self.decade
 		
